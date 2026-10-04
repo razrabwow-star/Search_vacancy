@@ -1,0 +1,19 @@
+services:
+  monitor:
+    build: .
+    init: true
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    mem_limit: 700m
+    shm_size: 128m
+    restart: "no"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"

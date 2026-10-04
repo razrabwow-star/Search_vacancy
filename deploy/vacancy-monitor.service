@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily analyst vacancy monitor
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/vacancy-monitor
+ExecStart=/usr/bin/docker compose run --rm --no-deps monitor run
+TimeoutStartSec=2h
+SuccessExitStatus=2

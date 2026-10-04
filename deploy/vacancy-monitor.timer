@@ -1,0 +1,11 @@
+[Unit]
+Description=Check analyst vacancies daily at 09:00 Moscow
+
+[Timer]
+OnCalendar=*-*-* 09:00:00 Europe/Moscow
+Persistent=true
+RandomizedDelaySec=60
+Unit=vacancy-monitor.service
+
+[Install]
+WantedBy=timers.target
