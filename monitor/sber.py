@@ -17,6 +17,13 @@ ID_KEYS = ('vacancyId', 'requisitionId', 'jobId', 'id', 'uuid')
 TOTAL_KEYS = ('totalElements', 'totalCount', 'totalRecords', 'total')
 
 
+def browser_options():
+    channel = os.getenv('SBER_BROWSER_CHANNEL', '').strip()
+    if channel not in ('', 'chrome', 'msedge'):
+        raise FetchError('SBER_BROWSER_CHANNEL: допустимы chrome, msedge или пустое значение')
+    return {'channel': channel} if channel else {}
+
+
 def field(item, keys):
     return next((item[k] for k in keys if item.get(k) not in (None, '')), None)
 
@@ -83,7 +90,7 @@ def collect(client, max_pages, directory):
         raise FetchError('Нужно выполнить login-sber и перенести сохранённую сессию на сервер')
     rows, expected, parse_errors = {}, [], []
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True, args=['--disable-dev-shm-usage'])
+        browser = p.chromium.launch(headless=True, args=['--disable-dev-shm-usage'], **browser_options())
         context = browser.new_context(storage_state=str(state_path), locale='ru-RU')
         restore(context, directory)
         page = context.new_page()
@@ -143,7 +150,7 @@ def login(directory):
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=False, **browser_options())
         context = browser.new_context(locale='ru-RU')
         page = context.new_page()
         page.goto(URL, wait_until='domcontentloaded', timeout=60000)

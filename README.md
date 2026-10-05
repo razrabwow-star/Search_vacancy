@@ -97,6 +97,8 @@ py -3.12 -m venv .venv
 
 Откроется отдельное окно браузера. Войдите по телефону/почте/Сбер ID, откройте каталог вакансий без фильтров, затем нажмите Enter в консоли. Скрипт сохранит `data/sber-state.json` и `data/sber-session-storage.json` (cookies, состояние IndexedDB и sessionStorage).
 
+Если Chromium не скачивается, используйте уже установленный Microsoft Edge. В PowerShell задайте `$env:SBER_BROWSER_CHANNEL="msedge"` и повторите команду `login-sber`; установка Chromium в этом случае не требуется. Для установленного Google Chrome используйте `chrome`. Эта настройка действует и на локальный тестовый сбор. На сервере оставьте её пустой: Docker содержит собственный Chromium. Команда `Remove-Item Env:SBER_BROWSER_CHANNEL` возвращает стандартный браузер в текущем PowerShell.
+
 Проверьте сборщик локально:
 
 ```powershell
