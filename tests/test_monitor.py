@@ -9,7 +9,7 @@ from monitor.telegram import chunks, flush, report
 from monitor.sber import decode_lists, to_vacancy
 from monitor.sources import add_page
 from monitor.http import FetchError
-from monitor.__main__ import run
+from monitor.__main__ import run, safe_error
 from monitor import sources
 
 
@@ -18,6 +18,11 @@ def vacancy(key='1', title='Системный аналитик', cities=None, m
 
 
 class MonitorTests(unittest.TestCase):
+    def test_error_diagnostics_do_not_expose_secrets(self):
+        self.assertNotIn('secret-token', safe_error(RuntimeError('https://api.telegram.org/botsecret-token/getUpdates')))
+        self.assertIn('UID 10001', safe_error(PermissionError('secret-path')))
+        self.assertEqual(safe_error(ValueError('Нет TELEGRAM_BOT_TOKEN')), 'Нет TELEGRAM_BOT_TOKEN')
+
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.store = Store(Path(self.directory.name) / 'db.sqlite3')

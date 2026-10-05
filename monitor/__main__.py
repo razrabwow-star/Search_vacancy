@@ -13,6 +13,24 @@ from .telegram import Sender, flush, report, chunks, NAMES, chat_ids
 LOG = logging.getLogger('monitor')
 
 
+def safe_error(error):
+    # Only messages authored by this application may appear in logs.
+    known = {
+        'Другой прогон уже выполняется',
+        'Нет TELEGRAM_BOT_TOKEN',
+        'Заполните TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID в .env',
+        'Telegram отклонил отправку; проверьте токен, chat_id и доступ бота к чату',
+        'Telegram недоступен; сообщения сохранены для повторной отправки',
+        'Не удалось получить обновления бота',
+        'Не удалось получить chat_id',
+    }
+    if isinstance(error, PermissionError):
+        return 'Нет прав на каталог data; назначьте владельца UID 10001'
+    if str(error) in known:
+        return str(error)
+    return f'Ошибка {type(error).__name__}; проверьте настройки и каталог data'
+
+
 def load_env():
     path = Path('.env')
     if path.exists():
@@ -138,9 +156,9 @@ def main():
                 return 0 if status == 'ok' else 2
             finally:
                 store.close()
-    except Exception:
+    except Exception as error:
         # Never emit third-party exception strings: Playwright/HTTP errors can embed secrets.
-        LOG.error('Запуск не завершён. Проверьте .env, доступность Telegram, сессию Сбера и отсутствие другого прогона. Очередь сохранена.')
+        LOG.error('Запуск не завершён: %s. Существующая очередь сохранена.', safe_error(error))
         return 1
 
 
