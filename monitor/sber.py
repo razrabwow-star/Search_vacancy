@@ -96,7 +96,7 @@ def collect(client, max_pages, directory):
         page = context.new_page()
         def response_received(response):
             path = urlparse(response.url).path.lower()
-            if response.request.method not in ('GET', 'POST') or not re.search(r'vacanc|requisition|job-search', path):
+            if response.request.method not in ('GET', 'POST') or not (re.search(r'vacanc|requisition|job-search', path) or path == '/api-web/app-external-candidate-bff/graphql'):
                 return
             if response.status in (401, 403):
                 parse_errors.append('Сессия Сбера истекла или доступ отклонён')
