@@ -5,12 +5,13 @@ import os
 import sys
 from pathlib import Path
 from contextlib import contextmanager
-from . import sources, sber
+from . import sources
 from .db import Store
 from .http import Client, FetchError
 from .telegram import Sender, flush, report, chunks, NAMES, chat_ids
 
 LOG = logging.getLogger('monitor')
+ACTIVE_SOURCES = ('tbank', 'yandex', 'alfa', 'vtb', 'rwb', 'avito')
 
 
 def safe_error(error):
@@ -72,7 +73,7 @@ def run(store, selected, client, max_pages, directory):
         observed = set()
         LOG.info('Проверка: %s', NAMES[source])
         try:
-            vacancies = sber.collect(client, max_pages, directory) if source == 'sber' else getattr(sources, source)(client, max_pages)
+            vacancies = getattr(sources, source)(client, max_pages)
             for vacancy in vacancies:
                 if vacancy.external_id in observed:
                     continue
@@ -99,9 +100,9 @@ def run(store, selected, client, max_pages, directory):
 def main():
     load_env()
     parser = argparse.ArgumentParser(description='Мониторинг вакансий бизнес-/системных аналитиков')
-    parser.add_argument('command', choices=['run', 'login-sber', 'retry-notifications', 'status', 'chat-id'], nargs='?', default='run')
+    parser.add_argument('command', choices=['run', 'retry-notifications', 'status', 'chat-id'], nargs='?', default='run')
     parser.add_argument('--dry-run', action='store_true', help='Отдельная тестовая база; без Telegram')
-    parser.add_argument('--sources', default=os.getenv('SOURCES', 'tbank,yandex,alfa,sber'))
+    parser.add_argument('--sources', default=os.getenv('SOURCES', 'tbank,yandex,alfa,vtb,rwb,avito'))
     parser.add_argument('--data-dir', default=os.getenv('DATA_DIR', 'data'))
     args = parser.parse_args()
     directory = Path(args.data_dir)
@@ -110,13 +111,10 @@ def main():
     logging.getLogger('httpx').setLevel(logging.WARNING)
     logging.getLogger('httpcore').setLevel(logging.WARNING)
     selected = list(dict.fromkeys(s.strip() for s in args.sources.split(',') if s.strip()))
-    if not selected or any(s not in NAMES for s in selected):
-        parser.error('Допустимые источники: tbank,yandex,alfa,sber')
+    if not selected or any(s not in ACTIVE_SOURCES for s in selected):
+        parser.error('Допустимые источники: ' + ','.join(ACTIVE_SOURCES) + '. Обновите SOURCES в .env; Сбер отключён.')
     try:
         with lock(directory / 'monitor.lock'):
-            if args.command == 'login-sber':
-                sber.login(directory)
-                return 0
             if args.command == 'chat-id':
                 ids = chat_ids(os.getenv('TELEGRAM_BOT_TOKEN'))
                 for chat_id, kind, title in ids:

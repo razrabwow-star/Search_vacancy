@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 import httpx
 import ssl
 
-NAMES = {'tbank': 'Т-Банк', 'yandex': 'Яндекс', 'alfa': 'Альфа-Банк', 'sber': 'Сбер'}
+NAMES = {'tbank': 'Т-Банк', 'yandex': 'Яндекс', 'alfa': 'Альфа-Банк', 'sber': 'Сбер', 'vtb': 'ВТБ', 'rwb': 'RWB', 'avito': 'Авито'}
 
 
 def chunks(text, limit=3500):

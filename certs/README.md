@@ -5,7 +5,7 @@ SHA-256 DER сертификата:
 
 Срок действия до 28 февраля 2032 года. Издатель: The Ministry of Digital Development and Communications.
 
-Этот корень нужен для TLS сайтов банков: у проверенного www.tbank.ru издатель сертификата — Russian Trusted Sub CA. Проверка TLS не отключается. Docker использует корень только внутри приложения (EXTRA_CA_CERT) и профиля его браузера. Хранилище сертификатов Ubuntu на сервере не меняется.
+Этот корень нужен для TLS сайтов банков: у проверенного www.tbank.ru издатель сертификата — Russian Trusted Sub CA. Проверка TLS не отключается. Docker использует корень только внутри HTTP-клиента приложения (EXTRA_CA_CERT). Хранилище сертификатов Ubuntu на сервере не меняется.
 
 Информация банка: https://www.tbank.ru/bank/help/certificates/
 

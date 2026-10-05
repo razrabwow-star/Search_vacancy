@@ -39,7 +39,7 @@ class Vacancy:
         return hashlib.sha256(json.dumps(data, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
-ROLE = re.compile(r'бизнес[ -]*аналитик|системн\w*[ -]+аналитик|business[ -]+analyst|systems?[ -]+analyst|bpm[ -]*аналитик', re.I)
+ROLE = re.compile(r'бизнес[ -]*аналитик\b|системн\w*[ -]+аналитик\b|business[ -]+analyst\b|systems?[ -]+analyst\b|bpm[ -]*аналитик\b', re.I)
 ANALYST = re.compile(r'аналитик|analyst', re.I)
 OTHER = re.compile(r'финансов|маркетинг|продуктов|кредитн|data analyst|аналитик данных|bi[ -]+аналитик|комплаенс', re.I)
 SIGNALS = [r'сбор\w* (?:и \w+ )?требован', r'бизнес[ -]*процесс', r'функциональн\w* требован', r'нефункциональн\w* требован', r'bpmn|uml', r'проектирован\w* (?:api|интеграц)', r'системн\w* анализ']

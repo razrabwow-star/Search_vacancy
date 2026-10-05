@@ -2,6 +2,7 @@ from urllib.parse import urlparse, parse_qs, quote
 from bs4 import BeautifulSoup
 from .http import FetchError
 from .model import Vacancy, plain, ANALYST, OTHER
+from .new_sources import vtb, rwb, avito
 
 MOSCOW_FIAS = '0c5b2444-70a0-4932-980c-b4dc0d3f02b5'
 TB_API = 'https://www.tbank.ru/pfpjobs/papi/'
